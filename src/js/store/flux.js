@@ -1,11 +1,49 @@
-const getState = ({ getStore, setStore }) => {
+const getState = ({ getStore, setStore, getActions }) => {
 	return {
 		store: {
-			//Your data structures, A.K.A Entities
+			agenda: [],
+			idName: ""
 		},
 		actions: {
-			//(Arrow) Functions that update the Store
-			// Remember to use the scope: scope.state.store & scope.setState()
+			loadAgenda: () => {
+				fetch("https://assets.breatheco.de/apis/fake/contact/agenda/PedroRD")
+					.then(res => res.json())
+
+					.then(data => setStore({ agenda: data }))
+
+					.catch(err => console.log("Err", err));
+			},
+			deleteContact: id => {
+				fetch("https://assets.breatheco.de/apis/fake/contact/" + id, {
+					method: "DELETE",
+					headers: {
+						"Content-Type": "application/json"
+					}
+				})
+					.then(response => console.log("Success:", JSON.stringify(response)))
+
+					.catch(err => console.log(err));
+			},
+
+			addContact: (contact, title, id = "", props) => {
+				fetch("https://assets.breatheco.de/apis/fake/contact/" + id, {
+					method: title == "Update contact" ? "PUT" : "POST",
+					body: JSON.stringify(contact),
+					headers: {
+						"Content-Type": "application/json"
+					}
+				})
+					.then(respose => {
+						if (respose.ok) {
+							props.history.push("/");
+						}
+					})
+					.catch(err => console.log(err));
+			},
+			setId: id => {
+				const stateId = setStore();
+				setStore({ ...stateId, idName: id });
+			}
 		}
 	};
 };
